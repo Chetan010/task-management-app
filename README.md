@@ -1,5 +1,5 @@
-#Task Management App
-Task Management App
+# Task Management App
+The application should allow users to manage tasks efficiently. User can add, edit and delete the task.
 
 # Steps to Create a React App Using npx create-react-app
 
