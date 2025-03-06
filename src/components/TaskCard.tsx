@@ -1,20 +1,26 @@
-import PropTypes from 'prop-types';
+
 import { useDispatch } from 'react-redux';
 import { useState } from "react";
 import { MdClose, MdEdit } from 'react-icons/md';
 import { Link, useNavigate } from 'react-router-dom';
-
-const TaskCard = ({task}) => {
-    const {id, title, description, duedate, status} = task
+interface Task {
+    id: string;
+    title?: string;
+    description?: string;
+    duedate: string;
+    status: string;
+}
+const TaskCard = ({task}: {task: Task}) => {
+    const {id = '', title = '', description = '', duedate = '', status = ''} = task
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const getDate = (dateString) => {
+    const getDate = (dateString: string) => {
         const dateObject = new Date(dateString);
         const currentDate = dateObject.toLocaleDateString();
         return currentDate;
     };
     let dueDate = getDate(duedate);
-    const getStatusColor = (status) => {
+    const getStatusColor = (status: string) => {
         switch (status.toLowerCase()) {
             case "done":
                 return "bg-green-200 text-green-800";

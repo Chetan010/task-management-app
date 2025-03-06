@@ -1,33 +1,48 @@
 import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { selectTaskById } from "../selectors/taskSelector";
-import { useDispatch, useSelector } from "react-redux";
-
-const EditTask = () => {
-    const { taskId } = useParams();
-    const navigate = useNavigate();
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+interface Errors {
+    title?: string;
+    description?: string;
+    duedate?: string;
+}
+interface FormData {
+    title: string;
+    description: string;
+    duedate: string;
+    status: string;
+}
+const AddTask = () => {
     const dispatch = useDispatch();
-    const task = useSelector(state => selectTaskById(state, taskId));
-    console.log(task)
-    const [formData, setFormData] = useState({
-        id: task.id,
-        title: task.title,
-        description: task.description,
-        duedate: task.duedate,
-        status: task.status,
+    const navigate = useNavigate();
+    const [formData, setFormData] = useState<FormData>({
+        title: '',
+        description: '',
+        duedate: '',
+        status: 'To Do',
     });
-    const [errors, setErrors] = useState({
+    const [errors, setErrors] = useState<Errors>({
         title: '',
         description: '',
         duedate: '',
     });
-    const handleSubmit = (e) => {
+    const handleChange = (e: any) => {
+      const {name, value} = e.target;
+      setFormData({
+        ...formData,
+        [name]: value
+      })
+      setErrors((prevErrors) => ({ ...prevErrors, [name]: '' }));
+    };
+
+    const handleSubmit = (e: any) => {
+        
         e.preventDefault();
         const formDataWithId = {
             ...formData,
-            id: taskId,
+            id: Math.random().toString(16).slice(2),
         }
-        const newErrors = {};
+        const newErrors: Errors = {};
         if (!formData.title) {
             newErrors.title = 'Title is required';
         }
@@ -41,22 +56,14 @@ const EditTask = () => {
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
         } else {
-            dispatch({ type: 'EDIT_TASK', task: formDataWithId });
+            dispatch({ type: 'ADD_TASK', task: formDataWithId });
             navigate(`/all-task`)
-        }
-    }
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({
-            ...formData,
-            [name]: value
-        });
-        setErrors((prevErrors) => ({ ...prevErrors, [name]: '' }));
+        }     
     };
     return <>
         <div className="w-[70%] mx-auto">
             <div className=''>
-                <h1 className="text-3xl font-bold my-8 text-center">Edit Task</h1>
+                <h1 className="text-3xl font-bold my-8 text-center">Add New Task</h1>
                 <div className='grid place-items-center'>
                     <form className="w-full mt-12 sm:mt-0 max-w-lg" onSubmit={handleSubmit}>
                         <div className="flex flex-wrap -mx-3 mb-2 sm:mb-6">
@@ -90,7 +97,7 @@ const EditTask = () => {
                                 />
                             </div>
                         </div>
-
+                        
                         <div className="flex flex-wrap -mx-3 mb-2 sm:mb-6">
                             <div className="w-full md:w-1/2 px-3">
                                 <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="priority">
@@ -122,14 +129,13 @@ const EditTask = () => {
                                     <option value="Done">Done</option>
                                 </select>
                             </div>
-
+                            
                         </div>
-                        <button type='submit' className='mt-8 w-full p-3 bg-primary-color rounded-lg text-center text-white hover:bg-primary-hover-color'>Edit</button>
+                        <button type='submit' className='mt-8 w-full p-3 bg-primary-color rounded-lg text-center text-white hover:bg-primary-hover-color'>Add</button>
                     </form>
                 </div>
             </div>
         </div>
     </>
 }
-
-export default EditTask
+export default AddTask

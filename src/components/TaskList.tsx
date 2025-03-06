@@ -1,35 +1,41 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import TaskCard from "./TaskCard";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { IoFilterSharp, IoClose } from "react-icons/io5";
-
+interface Task {
+    id: string;
+    status: string;
+    duedate: string;
+}
 const TaskList = () => {
-    const tasks = useSelector((state) => state.tasks.tasks);
+    const tasks: Task[] = useSelector((state: any) => state.tasks.tasks);
     console.log(tasks)
-    const [toggle, settoggle] = useState(false);
-    const [statusFilter, setStatusFilter] = useState("All");
-    const [dateSortOrder, setDateSortOrder] = useState("none");
+    const [toggle, settoggle] = useState<boolean>(false);
+    const [statusFilter, setStatusFilter] = useState<string>("All");
+    const [dateSortOrder, setDateSortOrder] = useState<string>("none");
 
-    const filteredTasks = tasks.filter((task) => {
+    const filteredTasks = tasks.filter((task: Task) => {
         const isStatusMatch =
             statusFilter === "All" || task.status === statusFilter;
         return isStatusMatch;
     });
 
-    const sortedTasks = () => {
+    const sortedTasks = useMemo((): Task[] => {
         if (dateSortOrder === "none") return filteredTasks;
       
-        return filteredTasks.slice().sort((a, b) => {
-          const dateA = new Date(a.duedate);
-          const dateB = new Date(b.duedate);
+        return filteredTasks.slice().sort((a: Task, b: Task) => {
+          const dateA = new Date(a.duedate).getTime();
+          const dateB = new Date(b.duedate).getTime();
           if (dateSortOrder === "asc") {
             return dateA - dateB;
           } else if (dateSortOrder === "desc") {
             return dateB - dateA;
+          }else{
+            return 0
           }
         });
-    };
+    },[filteredTasks]);
 
     return (
         <div className="w-[70%] mx-auto">
@@ -78,9 +84,9 @@ const TaskList = () => {
                     </div>
                 </div>
             </div>
-            {sortedTasks().length > 0 ? (
+            {sortedTasks.length > 0 ? (
                 <div className="flex flex-wrap gap-y-4 gap-x-14 justify-center  overflow-y-auto mt-5 h-[100vh] sm:h-[100vh] p-5">
-                    {sortedTasks().map((task) => (
+                    {sortedTasks.map((task) => (
                         <TaskCard
                             key={task.id}
                             task={task}
